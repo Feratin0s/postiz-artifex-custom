@@ -2,7 +2,7 @@ import { BillingComponent } from '@gitroom/frontend/components/billing/billing.c
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
-import { Logo } from '@gitroom/frontend/components/new-layout/logo';
+import { ArtifexTechLogo } from '@gitroom/frontend/components/ui/artifextech-logo';
 import { LogoutComponent } from '@gitroom/frontend/components/layout/logout.component';
 import React from 'react';
 import { OrganizationSelector } from '@gitroom/frontend/components/layout/organization.selector';
@@ -17,18 +17,18 @@ export const BillingAfter = () => {
         <OrganizationSelector asOpenSelect={true} />
       </div>
       <div className="flex justify-center mb-[10px]">
-        <Logo />
+        <ArtifexTechLogo />
       </div>
       <div className="text-center mb-[20px] text-xl [@media(max-width:1024px)]:text-xl">
         <h1 className="text-3xl [@media(max-width:1024px)]:text-xl">
           {t(
-            'join_10000_entrepreneurs_who_use_postiz',
-            'Join 10,000+ Entrepreneurs Who Use Postiz'
+            'social_da_artifextech',
+            'Social da ArtifexTech'
           )}
           <br />
           {t(
-            'to_manage_all_your_social_media_channels',
-            'To Manage All Your Social Media Channels'
+            'manage_social_media_in_one_place',
+            'Gerencie suas redes sociais em um só lugar'
           )}
         </h1>
         <br />

@@ -3,7 +3,7 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
-import { Logo } from '@gitroom/frontend/components/new-layout/logo';
+import { ArtifexTechLogo } from '@gitroom/frontend/components/ui/artifextech-logo';
 import { OAuthSelfHosted } from '@gitroom/frontend/components/oauth/self.hosted.component';
 
 export const OAuthAuthorize: FC<{ logged: boolean }> = ({ logged }) => {
@@ -118,7 +118,7 @@ export const OAuthAuthorize: FC<{ logged: boolean }> = ({ logged }) => {
         </div>
         <div className="relative z-10 text-center">
           <div className="flex justify-center mb-[24px]">
-            <Logo />
+            <ArtifexTechLogo />
           </div>
           <div className="text-[16px] text-gray-400">
             Please wait...
@@ -140,7 +140,7 @@ export const OAuthAuthorize: FC<{ logged: boolean }> = ({ logged }) => {
         </div>
         <div className="relative z-10 text-center">
           <div className="flex justify-center mb-[24px]">
-            <Logo />
+            <ArtifexTechLogo />
           </div>
           <div className="w-[80px] h-[80px] mx-auto mb-[24px] rounded-full bg-red-500/20 flex items-center justify-center">
             <svg
@@ -179,7 +179,7 @@ export const OAuthAuthorize: FC<{ logged: boolean }> = ({ logged }) => {
 
       <div className="relative z-10 w-full max-w-[500px] mx-auto px-[20px]">
         <div className="flex justify-center mb-[32px]">
-          <Logo />
+          <ArtifexTechLogo />
         </div>
 
         <div className="bg-[#1A1919] rounded-[16px] p-[32px] flex flex-col gap-[24px]">

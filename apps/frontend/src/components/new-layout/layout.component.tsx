@@ -1,7 +1,8 @@
 'use client';
 
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { Logo } from '@gitroom/frontend/components/new-layout/logo';
+import { ArtifexTechLogo } from '@gitroom/frontend/components/ui/artifextech-logo';
+import { ArtifexFooter } from '@gitroom/frontend/components/ui/footer-artifex';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 const ModeComponent = dynamic(
   () => import('@gitroom/frontend/components/layout/mode.component'),
@@ -50,7 +51,13 @@ const jakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
 });
 
-export const LayoutComponent = ({ children }: { children: ReactNode }) => {
+export const LayoutComponent = ({
+  children,
+  sourceCodeUrl,
+}: {
+  children: ReactNode;
+  sourceCodeUrl?: string;
+}) => {
   const fetch = useFetch();
 
   const { backendUrl, billingEnabled, isGeneral } = useVariables();
@@ -101,99 +108,105 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
             <PreConditionComponent />
             <NewSubscription />
             <ContinueProvider />
+            {/* Wrapper de fora: é ele que rola, assim o footer só aparece ao descer */}
             <div
               className={clsx(
-                'flex flex-col min-h-screen min-w-screen text-newTextColor p-[12px] mobile:p-[8px] mobile:pb-[80px]',
+                'flex flex-col h-[100dvh] overflow-y-auto overflow-x-hidden min-w-screen text-newTextColor p-[12px] mobile:p-[8px] mobile:pb-[80px]',
                 jakartaSans.className
               )}
             >
               <div>{user?.admin ? <Impersonate /> : <div />}</div>
-              {user.tier === 'FREE' && isGeneral && billingEnabled ? (
-                <FirstBillingComponent />
-              ) : (
-                <>
-                  <AnnouncementBanner />
-                  <div className="flex-1 flex gap-[8px] mobile:gap-0">
-                    <Support />
-                    {menuOpen && (
-                      <div
-                        className="hidden mobile:block fixed inset-0 bg-newBackdrop opacity-60 z-[490]"
-                        onClick={() => setMenuOpen(false)}
-                      />
-                    )}
-                    <div
-                      className={clsx(
-                        'flex flex-col bg-newBgColorInner w-[80px] rounded-[12px] mobile:fixed mobile:top-0 mobile:bottom-0 mobile:start-0 mobile:z-[491] mobile:rounded-none mobile:overflow-y-auto mobile:overflow-x-hidden',
-                        !menuOpen && 'mobile:hidden'
+              {/* Área do app: exatamente 1 tela (desktop) / no mínimo 1 tela (mobile) */}
+              <div className="flex flex-col shrink-0 h-[calc(100dvh-24px)] mobile:h-auto mobile:min-h-[calc(100dvh-88px)]">
+                {user.tier === 'FREE' && isGeneral && billingEnabled ? (
+                  <FirstBillingComponent />
+                ) : (
+                  <>
+                    <AnnouncementBanner />
+                    <div className="flex-1 min-h-0 flex gap-[8px] mobile:gap-0">
+                      <Support />
+                      {menuOpen && (
+                        <div
+                          className="hidden mobile:block fixed inset-0 bg-newBackdrop opacity-60 z-[490]"
+                          onClick={() => setMenuOpen(false)}
+                        />
                       )}
-                      onClick={() => setMenuOpen(false)}
-                    >
                       <div
-                        id="left-menu"
                         className={clsx(
-                          'fixed h-full w-[64px] start-[20px] flex flex-1 top-0 mobile:static mobile:h-auto mobile:min-h-full mobile:mx-auto',
-                          user?.admin && 'pt-[52px] max-h-[1000px]:w-[500px]'
+                          'flex flex-col bg-newBgColorInner w-[80px] rounded-[12px] mobile:fixed mobile:top-0 mobile:bottom-0 mobile:start-0 mobile:z-[491] mobile:rounded-none mobile:overflow-y-auto mobile:overflow-x-hidden',
+                          !menuOpen && 'mobile:hidden'
                         )}
+                        onClick={() => setMenuOpen(false)}
                       >
-                        <div className="flex flex-col h-full gap-[32px] mobile:gap-[16px] flex-1 pt-[12px] pb-[20px] mobile:pb-[12px]">
-                          <div className="flex justify-center">
-                            <Logo />
-                          </div>
-                          <TopMenu />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0 bg-newBgLineColor rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
-                      <div className="flex bg-newBgColorInner h-[80px] mobile:h-[64px] px-[20px] mobile:px-[12px] gap-[12px] items-center">
-                        <button
-                          className="hidden mobile:flex items-center justify-center w-[36px] h-[36px] -ms-[6px] rounded-[8px] text-textItemBlur hover:text-newTextColor hover:bg-boxFocused"
-                          onClick={() => setMenuOpen(true)}
-                          aria-label="Open menu"
+                        {/* Antes era "fixed h-full ... start-[20px] top-0": agora fica dentro da área do app */}
+                        <div
+                          id="left-menu"
+                          className={clsx(
+                            'flex flex-1 min-h-0 w-[64px] mx-auto mobile:h-auto mobile:min-h-full',
+                            user?.admin && 'pt-[52px] max-h-[1000px]:w-[500px]'
+                          )}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <path
-                              d="M3 6H21M3 12H21M3 18H21"
-                              stroke="currentColor"
-                              strokeWidth="1.8"
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                        </button>
-                        <div className="text-[24px] mobile:text-[20px] font-[600] flex flex-1 min-w-0">
-                          <Title />
-                        </div>
-                        <div className="flex gap-[20px] mobile:gap-[14px] mobile:items-center text-textItemBlur">
-                          <StreakComponent />
-                          <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
-                          <OrganizationSelector />
-                          <div className="hover:text-newTextColor">
-                            <ModeComponent />
+                          <div className="flex flex-col h-full gap-[32px] mobile:gap-[16px] flex-1 pt-[12px] pb-[20px] mobile:pb-[12px]">
+                            <div className="flex justify-center">
+                              <ArtifexTechLogo />
+                            </div>
+                            <TopMenu />
                           </div>
-                          <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
-                          <LanguageComponent />
-                          <div className="contents mobile:hidden">
-                            <ChromeExtensionComponent />
-                          </div>
-                          <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
-                          <div className="contents mobile:hidden">
-                            <AttachToFeedbackIcon />
-                          </div>
-                          <NotificationComponent />
                         </div>
                       </div>
-                      <div className="flex flex-1 min-w-0 gap-[1px] mobile:flex-col">
-                        {children}
+                      <div className="flex-1 min-w-0 bg-newBgLineColor rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
+                        <div className="flex bg-newBgColorInner h-[80px] mobile:h-[64px] px-[20px] mobile:px-[12px] gap-[12px] items-center">
+                          <button
+                            className="hidden mobile:flex items-center justify-center w-[36px] h-[36px] -ms-[6px] rounded-[8px] text-textItemBlur hover:text-newTextColor hover:bg-boxFocused"
+                            onClick={() => setMenuOpen(true)}
+                            aria-label="Open menu"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="22"
+                              height="22"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                            >
+                              <path
+                                d="M3 6H21M3 12H21M3 18H21"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </button>
+                          <div className="text-[24px] mobile:text-[20px] font-[600] flex flex-1 min-w-0">
+                            <Title />
+                          </div>
+                          <div className="flex gap-[20px] mobile:gap-[14px] mobile:items-center text-textItemBlur">
+                            <StreakComponent />
+                            <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
+                            <OrganizationSelector />
+                            <div className="hover:text-newTextColor">
+                              <ModeComponent />
+                            </div>
+                            <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
+                            <LanguageComponent />
+                            <div className="contents mobile:hidden">
+                              <ChromeExtensionComponent />
+                            </div>
+                            <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
+                            <div className="contents mobile:hidden">
+                              <AttachToFeedbackIcon />
+                            </div>
+                            <NotificationComponent />
+                          </div>
+                        </div>
+                        <div className="flex flex-1 min-w-0 gap-[1px] mobile:flex-col">
+                          {children}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
+              <ArtifexFooter sourceCodeUrl={sourceCodeUrl} />
             </div>
           </CheckPayment>
         </MantineWrapper>

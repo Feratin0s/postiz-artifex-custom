@@ -5,5 +5,9 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  return <LayoutComponent>{children}</LayoutComponent>;
+  return (
+    <LayoutComponent sourceCodeUrl={process.env.SOURCE_CODE_URL}>
+      {children}
+    </LayoutComponent>
+  );
 }

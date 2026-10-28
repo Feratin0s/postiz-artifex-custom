@@ -10,7 +10,7 @@ import { LanguageComponent } from '@gitroom/frontend/components/layout/language.
 import { AttachToFeedbackIcon } from '@gitroom/frontend/components/new-layout/sentry.feedback.component';
 import NotificationComponent from '@gitroom/frontend/components/notifications/notification.component';
 import dynamic from 'next/dynamic';
-import { LogoTextComponent } from '@gitroom/frontend/components/ui/logo-text.component';
+import { ArtifexTechLogoText } from '@gitroom/frontend/components/ui/artifextech-logo-text';
 import { pricing } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
 import { capitalize } from 'lodash';
 import clsx from 'clsx';
@@ -85,12 +85,12 @@ export const FirstBillingComponent = () => {
 
   const showYouTube = () => {
     modals.openModal({
-      title: 'Grow Fast With Postiz (Play the video)',
+      title: 'Tutorial Artipost (vídeo do Postiz)',
       children: (
         <iframe
           className="h-full aspect-video min-w-[800px]"
           src="https://www.youtube.com/embed/BdsCVvEYgHU?si=vvhaZJ8I5oXXvVJS?autoplay=1"
-          title="Postiz Tutorial"
+          title="Tutorial do Postiz"
           allow="autoplay"
           allowFullScreen
         />
@@ -188,7 +188,7 @@ export const FirstBillingComponent = () => {
     <div className="blurMe flex flex-1 flex-col bg-newBgColorInner pb-[60px] mobile:pb-[100px]">
       <div className="h-[92px] px-[80px] tablet:px-[32px] mobile:!px-[16px] py-[20px] flex border-b border-newColColor">
         <div className="flex-1 flex items-center text-textColor">
-          <LogoTextComponent />
+          <ArtifexTechLogoText />
         </div>
         <div className="flex items-center">
           <div className="flex gap-[20px] text-textItemBlur">

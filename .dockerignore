@@ -5,6 +5,7 @@
 node_modules/*
 node_modules
 docker-data/*
+postiz-config/
 dist
 .nx
 /apps/frontend/.next

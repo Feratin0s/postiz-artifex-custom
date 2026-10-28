@@ -24,6 +24,12 @@ import {
 import { HtmlComponent } from '@gitroom/frontend/components/layout/html.component';
 import Script from 'next/script';
 import { ChangeDirClient } from '@gitroom/frontend/components/new-layout/change.dir.client';
+import { Metadata } from 'next';
+import { APP_NAME } from '@gitroom/frontend/utils/brand';
+
+export const metadata: Metadata = {
+  title: APP_NAME,
+};
 
 const jakartaSans = Plus_Jakarta_Sans({
   weight: ['600', '500'],
@@ -40,7 +46,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <html>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link
+          rel="icon"
+          href="/social-artifextech-favicon.png"
+          type="image/png"
+          sizes="any"
+        />
         {!!process.env.DATAFAST_WEBSITE_ID && (
           <Script
             data-website-id={process.env.DATAFAST_WEBSITE_ID}
