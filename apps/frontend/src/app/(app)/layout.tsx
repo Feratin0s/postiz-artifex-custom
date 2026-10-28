@@ -6,12 +6,11 @@ import 'react-tooltip/dist/react-tooltip.css';
 import '@copilotkit/react-ui/styles.css';
 import LayoutContext from '@gitroom/frontend/components/layout/layout.context';
 import { ReactNode } from 'react';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { jakartaSans } from '@gitroom/frontend/fonts/plus-jakarta-sans/plus.jakarta.sans.font';
 import PlausibleProvider from 'next-plausible';
 import clsx from 'clsx';
 import { VariableContextComponent } from '@gitroom/react/helpers/variable.context';
 import { Fragment } from 'react';
-import { PHProvider } from '@gitroom/react/helpers/posthog';
 import UtmSaver from '@gitroom/helpers/utils/utm.saver';
 import { DubAnalytics } from '@gitroom/frontend/components/layout/dubAnalytics';
 import { FacebookComponent } from '@gitroom/frontend/components/layout/facebook.component';
@@ -30,12 +29,6 @@ import { APP_NAME } from '@gitroom/frontend/utils/brand';
 export const metadata: Metadata = {
   title: APP_NAME,
 };
-
-const jakartaSans = Plus_Jakarta_Sans({
-  weight: ['600', '500'],
-  style: ['normal', 'italic'],
-  subsets: ['latin'],
-});
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();
@@ -114,7 +107,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           }
         >
           <SentryComponent>
-            {/*<SetTimezone />*/}
             <HtmlComponent />
             <DubAnalytics />
             <FacebookComponent />
@@ -122,15 +114,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             <Plausible
               domain={!!process.env.IS_GENERAL ? 'postiz.com' : 'gitroom.com'}
             >
-              <PHProvider
-                phkey={process.env.NEXT_PUBLIC_POSTHOG_KEY}
-                host={process.env.NEXT_PUBLIC_POSTHOG_HOST}
-              >
-                <LayoutContext>
-                  <UtmSaver />
-                  {children}
-                </LayoutContext>
-              </PHProvider>
+              <LayoutContext>
+                <UtmSaver />
+                {children}
+              </LayoutContext>
             </Plausible>
           </SentryComponent>
         </VariableContextComponent>
