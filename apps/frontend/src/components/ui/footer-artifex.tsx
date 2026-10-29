@@ -35,7 +35,7 @@ export function ArtifexFooter({ sourceCodeUrl }: { sourceCodeUrl?: string }) {
                     <div>
                         <h3 className={title}>Artifex Tech</h3>
                         <p className={`${muted} text-[14px] mb-[8px]`}>
-                            Soluções em IA para WhatsApp
+                            Automatize suas redes sociais
                         </p>
                         <p className={`${muted} text-[12px] opacity-80`}>
                             CNPJ: 65.309.863/0001-90
