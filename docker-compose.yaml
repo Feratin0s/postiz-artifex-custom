@@ -9,9 +9,9 @@ services:
     restart: always
     volumes:
       - ./postiz-config:/config/
-      - postiz-uploads:/uploads/
+      - ./data/uploads:/uploads/
     ports:
-      - '4007:5000'
+      - '127.0.0.1:4007:5000'
     networks:
       - postiz-network
       - temporal-network
@@ -32,7 +32,7 @@ services:
       POSTGRES_USER: postiz-user
       POSTGRES_DB: postiz-db-local
     volumes:
-      - postgres-volume:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     networks:
       - postiz-network
     healthcheck:
@@ -50,7 +50,7 @@ services:
       timeout: 3s
       retries: 3
     volumes:
-      - postiz-redis-data:/data
+      - ./data/redis:/data
     networks:
       - postiz-network
 
@@ -83,7 +83,8 @@ services:
     expose:
       - 9200
     volumes:
-      - /var/lib/elasticsearch/data
+      # o ES grava em /usr/share/elasticsearch/data (a pasta do dono uid 1000)
+      - ./data/temporal-es:/usr/share/elasticsearch/data
 
   temporal-postgresql:
     container_name: temporal-postgresql
@@ -96,7 +97,7 @@ services:
     expose:
       - 5432
     volumes:
-      - /var/lib/postgresql/data
+      - ./data/temporal-postgres:/var/lib/postgresql/data
 
   temporal:
     container_name: temporal
@@ -148,18 +149,8 @@ services:
     ports:
       - '8080:8080'
 
-volumes:
-  postgres-volume:
-    external: false
-
-  postiz-redis-data:
-    external: false
-
-  postiz-config:
-    external: false
-
-  postiz-uploads:
-    external: false
+# Sem a secao "volumes:" no final: tudo agora fica em ./data (bind mount),
+# entao "docker volume prune" e "docker compose down -v" nao apagam mais nada.
 
 networks:
   postiz-network:
