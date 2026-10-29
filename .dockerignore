@@ -22,3 +22,4 @@ dist
 .git
 .github
 reports
+data/
