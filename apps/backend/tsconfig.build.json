@@ -3,6 +3,8 @@
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"],
   "compilerOptions": {
     "module": "CommonJS",
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM"],
     "resolveJsonModule": true,
     "declaration": true,
     "removeComments": true,

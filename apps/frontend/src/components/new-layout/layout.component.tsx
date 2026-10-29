@@ -106,16 +106,24 @@ export const LayoutComponent = ({
             <PreConditionComponent />
             <NewSubscription />
             <ContinueProvider />
-            {/* Wrapper de fora: é ele que rola, assim o footer só aparece ao descer */}
+
+            {/* 
+              1. Container principal: Altura fixa da tela e overflow-hidden.
+              Removemos o overflow-y-auto daqui para não quebrar o layout.
+            */}
             <div
               className={clsx(
-                'flex flex-col h-[100dvh] overflow-y-auto overflow-x-hidden min-w-screen text-newTextColor p-[12px] mobile:p-[8px] mobile:pb-[80px]',
+                'flex flex-col h-[100dvh] overflow-hidden min-w-screen text-newTextColor p-[12px] mobile:p-[8px] mobile:pb-[8px]',
                 jakartaSans.className
               )}
             >
               <div>{user?.admin ? <Impersonate /> : <div />}</div>
-              {/* Área do app: exatamente 1 tela (desktop) / no mínimo 1 tela (mobile) */}
-              <div className="flex flex-col shrink-0 h-[calc(100dvh-24px)] mobile:h-auto mobile:min-h-[calc(100dvh-88px)]">
+
+              {/* 
+                2. Área do App: flex-1 e min-h-0 para ocupar todo o espaço restante 
+                acima do footer, sem forçar alturas fixas que quebram o calendário.
+              */}
+              <div className="flex flex-col flex-1 min-h-0 w-full">
                 {user.tier === 'FREE' && isGeneral && billingEnabled ? (
                   <FirstBillingComponent />
                 ) : (
@@ -152,9 +160,11 @@ export const LayoutComponent = ({
                         </div>
                       </div>
                     </div>
+
+                    {/* Container do Conteúdo (Calendário etc) */}
                     <div className="flex-1 min-w-0 bg-newBgLineColor rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
-                      {/* relative: the notifications popup spans this bar on phones */}
-                      <div className="relative flex bg-newBgColorInner h-[80px] mobile:h-[64px] px-[20px] mobile:px-[12px] gap-[12px] items-center">
+                      {/* Top Bar */}
+                      <div className="relative flex bg-newBgColorInner h-[80px] mobile:h-[64px] px-[20px] mobile:px-[12px] gap-[12px] items-center shrink-0">
                         <button
                           className="hidden mobile:flex items-center justify-center w-[36px] h-[36px] -ms-[6px] rounded-[8px] text-textItemBlur hover:text-newTextColor hover:bg-boxFocused"
                           onClick={() => setMenuOpen(true)}
@@ -198,14 +208,23 @@ export const LayoutComponent = ({
                           <NotificationComponent />
                         </div>
                       </div>
-                      <div className="flex flex-1 min-w-0 gap-[1px] mobile:flex-col">
+
+                      {/* Children (Páginas, Calendário, etc) */}
+                      <div className="flex flex-1 min-w-0 gap-[1px] mobile:flex-col overflow-hidden">
                         {children}
                       </div>
                     </div>
                   </>
                 )}
               </div>
-              <ArtifexFooter sourceCodeUrl={sourceCodeUrl} />
+
+              {/* 
+                3. Footer: shrink-0 e mt-[12px] (ou a margem que preferir).
+                Fica fora do container que cresce (flex-1), garantindo que não quebre o conteúdo.
+              */}
+              <div className="shrink-0 mt-[12px] w-full">
+                <ArtifexFooter sourceCodeUrl={sourceCodeUrl} />
+              </div>
             </div>
           </CheckPayment>
         </MantineWrapper>
