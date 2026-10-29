@@ -106,24 +106,16 @@ export const LayoutComponent = ({
             <PreConditionComponent />
             <NewSubscription />
             <ContinueProvider />
-
-            {/* 
-              1. Container principal: Altura fixa da tela e overflow-hidden.
-              Removemos o overflow-y-auto daqui para não quebrar o layout.
-            */}
+            {/* Wrapper de fora: é ele que rola, assim o footer só aparece ao descer */}
             <div
               className={clsx(
-                'flex flex-col h-[100dvh] overflow-hidden min-w-screen text-newTextColor p-[12px] mobile:p-[8px] mobile:pb-[8px]',
+                'flex flex-col h-[100dvh] overflow-y-auto overflow-x-hidden min-w-screen text-newTextColor p-[12px] mobile:p-[8px] mobile:pb-[80px]',
                 jakartaSans.className
               )}
             >
               <div>{user?.admin ? <Impersonate /> : <div />}</div>
-
-              {/* 
-                2. Área do App: flex-1 e min-h-0 para ocupar todo o espaço restante 
-                acima do footer, sem forçar alturas fixas que quebram o calendário.
-              */}
-              <div className="flex flex-col flex-1 min-h-0 w-full">
+              {/* Área do app: exatamente 1 tela (desktop) / no mínimo 1 tela (mobile) */}
+              <div className="flex flex-col shrink-0 h-[calc(100dvh-24px)] mobile:h-auto mobile:min-h-[calc(100dvh-88px)]">
                 {user.tier === 'FREE' && isGeneral && billingEnabled ? (
                   <FirstBillingComponent />
                 ) : (
@@ -159,72 +151,61 @@ export const LayoutComponent = ({
                           </div>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Container do Conteúdo (Calendário etc) */}
-                    <div className="flex-1 min-w-0 bg-newBgLineColor rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
-                      {/* Top Bar */}
-                      <div className="relative flex bg-newBgColorInner h-[80px] mobile:h-[64px] px-[20px] mobile:px-[12px] gap-[12px] items-center shrink-0">
-                        <button
-                          className="hidden mobile:flex items-center justify-center w-[36px] h-[36px] -ms-[6px] rounded-[8px] text-textItemBlur hover:text-newTextColor hover:bg-boxFocused"
-                          onClick={() => setMenuOpen(true)}
-                          aria-label="Open menu"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
+                      <div className="flex-1 min-h-0 min-w-0 bg-newBgLineColor rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
+                        {/* relative: the notifications popup spans this bar on phones */}
+                        <div className="relative flex shrink-0 bg-newBgColorInner h-[80px] mobile:h-[64px] px-[20px] mobile:px-[12px] gap-[12px] items-center">
+                          <button
+                            className="hidden mobile:flex items-center justify-center w-[36px] h-[36px] -ms-[6px] rounded-[8px] text-textItemBlur hover:text-newTextColor hover:bg-boxFocused"
+                            onClick={() => setMenuOpen(true)}
+                            aria-label="Open menu"
                           >
-                            <path
-                              d="M3 6H21M3 12H21M3 18H21"
-                              stroke="currentColor"
-                              strokeWidth="1.8"
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                        </button>
-                        <div className="text-[24px] mobile:text-[20px] font-[600] flex flex-1 min-w-0">
-                          <Title />
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="22"
+                              height="22"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                            >
+                              <path
+                                d="M3 6H21M3 12H21M3 18H21"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </button>
+                          <div className="text-[24px] mobile:text-[20px] font-[600] flex flex-1 min-w-0">
+                            <Title />
+                          </div>
+                          <div className="flex gap-[20px] mobile:gap-[14px] mobile:items-center text-textItemBlur">
+                            <StreakComponent />
+                            <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
+                            <OrganizationSelector />
+                            <InvoicesComponent />
+                            <div className="hover:text-newTextColor">
+                              <ModeComponent />
+                            </div>
+                            <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
+                            <LanguageComponent />
+                            <div className="contents mobile:hidden">
+                              <ChromeExtensionComponent />
+                            </div>
+                            <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
+                            <div className="contents mobile:hidden">
+                              <AttachToFeedbackIcon />
+                            </div>
+                            <NotificationComponent />
+                          </div>
                         </div>
-                        <div className="flex gap-[20px] mobile:gap-[14px] mobile:items-center text-textItemBlur">
-                          <StreakComponent />
-                          <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
-                          <OrganizationSelector />
-                          <InvoicesComponent />
-                          <div className="hover:text-newTextColor">
-                            <ModeComponent />
-                          </div>
-                          <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
-                          <LanguageComponent />
-                          <div className="contents mobile:hidden">
-                            <ChromeExtensionComponent />
-                          </div>
-                          <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
-                          <div className="contents mobile:hidden">
-                            <AttachToFeedbackIcon />
-                          </div>
-                          <NotificationComponent />
+                        <div className="flex flex-1 min-h-0 min-w-0 gap-[1px] mobile:flex-col overflow-hidden">
+                          {children}
                         </div>
-                      </div>
-
-                      {/* Children (Páginas, Calendário, etc) */}
-                      <div className="flex flex-1 min-w-0 gap-[1px] mobile:flex-col overflow-hidden">
-                        {children}
                       </div>
                     </div>
                   </>
                 )}
               </div>
-
-              {/* 
-                3. Footer: shrink-0 e mt-[12px] (ou a margem que preferir).
-                Fica fora do container que cresce (flex-1), garantindo que não quebre o conteúdo.
-              */}
-              <div className="shrink-0 mt-[12px] w-full">
-                <ArtifexFooter sourceCodeUrl={sourceCodeUrl} />
-              </div>
+              <ArtifexFooter sourceCodeUrl={sourceCodeUrl} />
             </div>
           </CheckPayment>
         </MantineWrapper>
