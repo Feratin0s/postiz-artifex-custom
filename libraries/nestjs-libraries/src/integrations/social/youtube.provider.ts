@@ -65,11 +65,8 @@ export class YoutubeProvider extends SocialAbstract implements SocialProvider {
   scopes = [
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/youtube',
-    'https://www.googleapis.com/auth/youtube.force-ssl',
     'https://www.googleapis.com/auth/youtube.readonly',
     'https://www.googleapis.com/auth/youtube.upload',
-    'https://www.googleapis.com/auth/youtubepartner',
     'https://www.googleapis.com/auth/yt-analytics.readonly',
   ];
 
@@ -93,9 +90,9 @@ export class YoutubeProvider extends SocialAbstract implements SocialProvider {
 
   override handleErrors(body: string):
     | {
-        type: 'refresh-token' | 'bad-body';
-        value: string;
-      }
+      type: 'refresh-token' | 'bad-body';
+      value: string;
+    }
     | undefined {
     if (body.includes('invalidTags')) {
       return {
@@ -271,9 +268,8 @@ export class YoutubeProvider extends SocialAbstract implements SocialProvider {
 
   refreshErrorMessage(err: any): string | undefined {
     const data = err?.response?.data || {};
-    const text = `${data.error_subtype || ''} ${data.error_description || ''} ${
-      err?.message || ''
-    }`;
+    const text = `${data.error_subtype || ''} ${data.error_description || ''} ${err?.message || ''
+      }`;
 
     if (text.includes('invalid_rapt')) {
       return `because your organization's Google Workspace session policy invalidated its access. Ask your Google Workspace admin to mark Postiz as a trusted app and turn on "Exempt trusted apps" (https://support.google.com/a/answer/9368756) to prevent this from happening again`;
