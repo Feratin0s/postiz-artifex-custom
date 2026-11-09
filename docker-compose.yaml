@@ -22,6 +22,12 @@ services:
         condition: service_healthy
     env_file:
       - ./postiz-config/postiz.env
+    environment:
+      ENTERPRISE_DB_HOST: ${DB_HOST:-}
+      ENTERPRISE_DB_PORT: ${DB_PORT:-3306}
+      ENTERPRISE_DB_USER: ${DB_USER:-}
+      ENTERPRISE_DB_PASSWORD: ${DB_PASSWORD:-}
+      ENTERPRISE_DB_NAME: ${DB_NAME:-}
 
   postiz-postgres:
     image: postgres:17-alpine

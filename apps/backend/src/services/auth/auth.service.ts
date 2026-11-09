@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { ForgotReturnPasswordDto } from '@gitroom/nestjs-libraries/dtos/auth/forgot-return.password.dto';
 import { EmailService } from '@gitroom/nestjs-libraries/services/email.service';
 import { NewsletterService } from '@gitroom/nestjs-libraries/newsletter/newsletter.service';
+import { EnterprisePlanService } from '@gitroom/backend/services/auth/enterprise-plan.service';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,8 @@ export class AuthService {
     private _userService: UsersService,
     private _organizationService: OrganizationService,
     private _emailService: EmailService,
-    private _providerManager: AuthProviderManager
+    private _providerManager: AuthProviderManager,
+    private _enterprisePlanService: EnterprisePlanService
   ) {}
   async canRegister(provider: string) {
     if (
@@ -330,6 +332,13 @@ export class AuthService {
   }
 
   private async jwt(user: User) {
+    const organizations = await this._organizationService.getOrgsByUserId(
+      user.id
+    );
+    await this._enterprisePlanService.assertUserHasActiveEnterprise(
+      organizations.map((organization) => organization.name)
+    );
+
     if (user.password) {
       delete user.password;
     }

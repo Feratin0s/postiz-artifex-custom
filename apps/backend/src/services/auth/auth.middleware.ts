@@ -8,6 +8,7 @@ import { getCookieUrlFromDomain } from '@gitroom/helpers/subdomain/subdomain.man
 import { HttpForbiddenException } from '@gitroom/nestjs-libraries/services/exception.filter';
 import { MastraService } from '@gitroom/nestjs-libraries/chat/mastra.service';
 import { setSentryUserContext } from '@gitroom/nestjs-libraries/sentry/initialize.sentry';
+import { EnterprisePlanService } from '@gitroom/backend/services/auth/enterprise-plan.service';
 
 export const removeAuth = (res: Response) => {
   res.cookie('auth', '', {
@@ -29,7 +30,8 @@ export const removeAuth = (res: Response) => {
 export class AuthMiddleware implements NestMiddleware {
   constructor(
     private _organizationService: OrganizationService,
-    private _userService: UsersService
+    private _userService: UsersService,
+    private _enterprisePlanService: EnterprisePlanService
   ) {}
   async use(req: Request, res: Response, next: NextFunction) {
     const auth = req.headers.auth || req.cookies.auth;
@@ -64,6 +66,14 @@ export class AuthMiddleware implements NestMiddleware {
         );
 
         if (loadImpersonate) {
+          if (
+            !(await this._enterprisePlanService.isActiveForOrganization(
+              loadImpersonate.organization.name
+            ))
+          ) {
+            throw new HttpForbiddenException();
+          }
+
           user = loadImpersonate.user;
           user.isSuperAdmin = true;
           delete user.password;
@@ -100,6 +110,12 @@ export class AuthMiddleware implements NestMiddleware {
         organization.find((org) => org.id === orgHeader) ||
         organization.find((org) => org.subscription) ||
         organization[0];
+
+      if (
+        !(await this._enterprisePlanService.isActiveForOrganization(setOrg.name))
+      ) {
+        throw new HttpForbiddenException();
+      }
 
       if (!organization) {
         throw new HttpForbiddenException();

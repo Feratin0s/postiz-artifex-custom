@@ -11,6 +11,7 @@ import { CodesService } from '@gitroom/nestjs-libraries/services/codes.service';
 import { PublicIntegrationsController } from '@gitroom/backend/public-api/routes/v1/public.integrations.controller';
 import { PublicAuthMiddleware } from '@gitroom/backend/services/auth/public.auth.middleware';
 import { SuperAdminGuard } from '@gitroom/backend/services/auth/super.admin.guard';
+import { EnterprisePlanService } from '@gitroom/backend/services/auth/enterprise-plan.service';
 
 const authenticatedController = [PublicIntegrationsController];
 @Module({
@@ -18,6 +19,7 @@ const authenticatedController = [PublicIntegrationsController];
   controllers: process.env.MCP_ONLY ? [] : [...authenticatedController],
   providers: [
     AuthService,
+    EnterprisePlanService,
     StripeService,
     OpenaiService,
     ExtractContentService,
