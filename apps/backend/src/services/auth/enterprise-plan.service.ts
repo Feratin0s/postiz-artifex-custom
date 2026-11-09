@@ -5,52 +5,17 @@ import mariadb from 'mariadb';
 export class EnterprisePlanService {
   private pool: ReturnType<typeof mariadb.createPool> | null = null;
 
-  private getEnterpriseId(organizationName: string) {
-    const match = organizationName.match(/###(\d+)$/);
-    if (!match) {
-      return null;
-    }
-
-    const enterpriseId = Number(match[1]);
-    return Number.isSafeInteger(enterpriseId) && enterpriseId > 0
-      ? enterpriseId
-      : null;
-  }
-
-  isEnterpriseOrganization(organizationName: string) {
-    return this.getEnterpriseId(organizationName) !== null;
-  }
-
-  async isActiveForOrganization(organizationName: string) {
-    const enterpriseId = this.getEnterpriseId(organizationName);
-    if (!enterpriseId) {
-      return true;
-    }
-
+  async isActiveForEmail(email: string) {
     const rows = await this.getPool().query(
-      'SELECT is_active FROM enterprise WHERE id = ? LIMIT 1',
-      [enterpriseId]
+      'SELECT is_active FROM enterprise WHERE LOWER(email) = LOWER(?) LIMIT 1',
+      [email.trim()]
     );
 
     return rows.length > 0 && Number(rows[0].is_active) === 1;
   }
 
-  async assertUserHasActiveEnterprise(organizationNames: string[]) {
-    const enterpriseOrganizations = organizationNames.filter((name) =>
-      this.isEnterpriseOrganization(name)
-    );
-
-    if (!enterpriseOrganizations.length) {
-      return;
-    }
-
-    const activeOrganizations = await Promise.all(
-      enterpriseOrganizations.map((name) =>
-        this.isActiveForOrganization(name)
-      )
-    );
-
-    if (!activeOrganizations.some(Boolean)) {
+  async assertActiveForEmail(email: string) {
+    if (!(await this.isActiveForEmail(email))) {
       throw new Error('Enterprise plan is inactive');
     }
   }

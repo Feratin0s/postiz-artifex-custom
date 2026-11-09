@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '@gitroom/helpers/auth/auth.service';
-import { User } from '@prisma/client';
+import { Provider, User } from '@prisma/client';
 import { OrganizationService } from '@gitroom/nestjs-libraries/database/prisma/organizations/organization.service';
 import { UsersService } from '@gitroom/nestjs-libraries/database/prisma/users/users.service';
 import { getCookieUrlFromDomain } from '@gitroom/helpers/subdomain/subdomain.management';
@@ -67,8 +67,9 @@ export class AuthMiddleware implements NestMiddleware {
 
         if (loadImpersonate) {
           if (
-            !(await this._enterprisePlanService.isActiveForOrganization(
-              loadImpersonate.organization.name
+            loadImpersonate.user.providerName === Provider.GENERIC &&
+            !(await this._enterprisePlanService.isActiveForEmail(
+              loadImpersonate.user.email
             ))
           ) {
             throw new HttpForbiddenException();
@@ -112,7 +113,8 @@ export class AuthMiddleware implements NestMiddleware {
         organization[0];
 
       if (
-        !(await this._enterprisePlanService.isActiveForOrganization(setOrg.name))
+        user.providerName === Provider.GENERIC &&
+        !(await this._enterprisePlanService.isActiveForEmail(user.email))
       ) {
         throw new HttpForbiddenException();
       }

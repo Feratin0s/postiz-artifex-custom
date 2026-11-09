@@ -320,6 +320,11 @@ export class AuthService {
     if (!user) {
       throw new Error('Invalid user');
     }
+
+    if (provider.toUpperCase() === Provider.GENERIC) {
+      await this._enterprisePlanService.assertActiveForEmail(user.email);
+    }
+
     const checkExists = await this._userService.getUserByProvider(
       user.id,
       provider as Provider
@@ -332,12 +337,9 @@ export class AuthService {
   }
 
   private async jwt(user: User) {
-    const organizations = await this._organizationService.getOrgsByUserId(
-      user.id
-    );
-    await this._enterprisePlanService.assertUserHasActiveEnterprise(
-      organizations.map((organization) => organization.name)
-    );
+    if (user.providerName === Provider.GENERIC) {
+      await this._enterprisePlanService.assertActiveForEmail(user.email);
+    }
 
     if (user.password) {
       delete user.password;
