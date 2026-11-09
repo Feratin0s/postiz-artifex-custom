@@ -45,28 +45,83 @@ export function Register() {
   const [code, setCode] = useState(getQuery?.get('code') || '');
   const [state] = useState(getQuery?.get('state') || '');
   const [show, setShow] = useState(false);
+  const [callbackError, setCallbackError] = useState<
+    'plan-cancelled' | 'general' | null
+  >(null);
   useEffect(() => {
     if (provider && code) {
       load();
     }
   }, []);
   const load = useCallback(async () => {
-    const { token } = await (
-      await fetch(`/auth/oauth/${provider?.toUpperCase() || 'LOCAL'}/exists`, {
-        method: 'POST',
-        body: JSON.stringify({
-          code,
-          state,
-        }),
-      })
-    ).json();
-    if (token) {
-      setCode(token);
-      setShow(true);
+    try {
+      const response = await fetch(
+        `/auth/oauth/${provider?.toUpperCase() || 'LOCAL'}/exists`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            code,
+            state,
+          }),
+        }
+      );
+      let result: { code?: string; token?: string; login?: boolean } | null;
+      try {
+        result = await response.json();
+      } catch {
+        result = null;
+      }
+
+      if (!response.ok) {
+        setCallbackError(
+          result?.code === 'ENTERPRISE_PLAN_INACTIVE'
+            ? 'plan-cancelled'
+            : 'general'
+        );
+        return;
+      }
+
+      if (result?.token) {
+        setCode(result.token);
+        setShow(true);
+      } else if (result?.login) {
+        return;
+      } else {
+        setCallbackError('general');
+      }
+    } catch {
+      setCallbackError('general');
     }
   }, [provider, code]);
+  const t = useT();
   if (!code && !provider) {
     return <RegisterAfter token="" provider="LOCAL" />;
+  }
+  if (callbackError) {
+    const planCancelled = callbackError === 'plan-cancelled';
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+        <h1 className="text-[28px] font-[500]">
+          {planCancelled
+            ? t('plan_cancelled', 'Plano cancelado')
+            : t('auth_callback_failed', 'Não foi possível entrar')}
+        </h1>
+        <p className="text-[14px] text-gray-300" role="alert">
+          {planCancelled
+            ? t(
+                'plan_cancelled_message',
+                'Seu plano foi cancelado. Entre em contato com o suporte para reativar seu acesso.'
+              )
+            : t(
+                'auth_callback_failed_message',
+                'Não foi possível concluir a autenticação. Tente novamente ou entre em contato com o suporte.'
+              )}
+        </p>
+        <Link href="/auth/login" className="underline hover:font-bold">
+          {t('back_to_login', 'Voltar ao login')}
+        </Link>
+      </div>
+    );
   }
   if (!show) {
     return <LoadingComponent />;

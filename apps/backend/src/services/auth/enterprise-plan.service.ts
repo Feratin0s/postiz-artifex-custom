@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import mariadb from 'mariadb';
 
 @Injectable()
@@ -15,8 +15,29 @@ export class EnterprisePlanService {
   }
 
   async assertActiveForEmail(email: string) {
-    if (!(await this.isActiveForEmail(email))) {
-      throw new Error('Enterprise plan is inactive');
+    const rows = await this.getPool().query(
+      'SELECT is_active FROM enterprise WHERE LOWER(email) = LOWER(?) LIMIT 1',
+      [email.trim()]
+    );
+
+    if (!rows.length) {
+      throw new HttpException(
+        {
+          code: 'ENTERPRISE_NOT_FOUND',
+          message: 'Enterprise account not found',
+        },
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    if (Number(rows[0].is_active) !== 1) {
+      throw new HttpException(
+        {
+          code: 'ENTERPRISE_PLAN_INACTIVE',
+          message: 'Enterprise plan is inactive',
+        },
+        HttpStatus.FORBIDDEN
+      );
     }
   }
 
