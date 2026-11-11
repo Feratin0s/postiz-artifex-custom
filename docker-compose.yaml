@@ -20,6 +20,8 @@ services:
         condition: service_healthy
       postiz-redis:
         condition: service_healthy
+      temporal:
+        condition: service_healthy
     env_file:
       - ./postiz-config/postiz.env
     environment:
@@ -76,6 +78,7 @@ services:
   temporal-elasticsearch:
     container_name: temporal-elasticsearch
     image: elasticsearch:7.17.27
+    restart: unless-stopped
     environment:
       - cluster.routing.allocation.disk.threshold_enabled=true
       - cluster.routing.allocation.disk.watermark.low=512mb
@@ -91,9 +94,16 @@ services:
     volumes:
       # o ES grava em /usr/share/elasticsearch/data (a pasta do dono uid 1000)
       - ./data/temporal-es:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "tctl --address temporal:7233 cluster health | grep -q SERVING"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 60s
 
   temporal-postgresql:
     container_name: temporal-postgresql
+    restart: unless-stopped
     image: postgres:16
     environment:
       POSTGRES_PASSWORD: temporal
@@ -107,6 +117,7 @@ services:
 
   temporal:
     container_name: temporal
+    restart: unless-stopped
     ports:
       - '7233:7233'
     image: temporalio/auto-setup:1.28.1
@@ -133,6 +144,7 @@ services:
 
   temporal-admin-tools:
     container_name: temporal-admin-tools
+    #restart: unless-stopped
     image: temporalio/admin-tools:1.28.1-tctl-1.18.4-cli-1.4.1
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
