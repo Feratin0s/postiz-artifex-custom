@@ -95,11 +95,11 @@ services:
       # o ES grava em /usr/share/elasticsearch/data (a pasta do dono uid 1000)
       - ./data/temporal-es:/usr/share/elasticsearch/data
     healthcheck:
-      test: ["CMD-SHELL", "tctl --address temporal:7233 cluster health | grep -q SERVING"]
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health >/dev/null || exit 1"]
       interval: 15s
-      timeout: 10s
+      timeout: 5s
       retries: 20
-      start_period: 60s
+      start_period: 40s
 
   temporal-postgresql:
     container_name: temporal-postgresql
@@ -114,6 +114,11 @@ services:
       - 5432
     volumes:
       - ./data/temporal-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   temporal:
     container_name: temporal
@@ -141,7 +146,12 @@ services:
       - ./dynamicconfig:/etc/temporal/config/dynamicconfig
     labels:
       kompose.volume.type: configMap
-
+    healthcheck:
+      test: ["CMD-SHELL", "tctl --address $$(hostname -i):7233 cluster health | grep -q SERVING"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 90s
   temporal-admin-tools:
     container_name: temporal-admin-tools
     #restart: unless-stopped
